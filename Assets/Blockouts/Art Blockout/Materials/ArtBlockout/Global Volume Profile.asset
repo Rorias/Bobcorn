@@ -94,19 +94,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdfbdbb87d3286943a057f7791b43141, type: 3}
   m_Name: ChannelMixer
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   redOutRedIn:
     m_OverrideState: 0
     m_Value: 100
   redOutGreenIn:
     m_OverrideState: 1
-    m_Value: 7.86
+    m_Value: -8.5
   redOutBlueIn:
     m_OverrideState: 0
     m_Value: 0
   greenOutRedIn:
     m_OverrideState: 1
-    m_Value: 19.89
+    m_Value: 8.46
   greenOutGreenIn:
     m_OverrideState: 0
     m_Value: 100
