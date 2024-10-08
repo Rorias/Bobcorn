@@ -1,12 +1,4 @@
-﻿
-using UnityEditor.VersionControl;
-using UnityEngine;
-
-/*
-    This file has a commented version with details about how each line works. 
-    The commented version contains code that is easier and simpler to read. This file is minified.
-*/
-
+﻿using UnityEngine;
 
 /// <summary>
 /// Main script for third-person movement of the character in the game.
@@ -15,7 +7,6 @@ using UnityEngine;
 /// </summary>
 public class ThirdPersonController : MonoBehaviour
 {
-
     [Tooltip("Speed ​​at which the character moves. It is not affected by gravity or jumping.")]
     public float velocity = 5f;
     [Tooltip("This value is added to the speed value while the character is sprinting.")]
@@ -45,8 +36,7 @@ public class ThirdPersonController : MonoBehaviour
     Animator animator;
     CharacterController cc;
 
-
-    void Start()
+    private void Start()
     {
         cc = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
@@ -56,11 +46,8 @@ public class ThirdPersonController : MonoBehaviour
             Debug.LogWarning("Hey buddy, you don't have the Animator component in your player. Without it, the animations won't work.");
     }
 
-
-    // Update is only being used here to identify keys and trigger animations
-    void Update()
+    private void Update()
     {
-
         // Input checkers
         inputHorizontal = Input.GetAxis("Horizontal");
         inputVertical = Input.GetAxis("Vertical");
@@ -108,8 +95,6 @@ public class ThirdPersonController : MonoBehaviour
 
     }
 
-
-    // With the inputs and animations defined, FixedUpdate is responsible for applying movements and actions to the player
     private void FixedUpdate()
     {
 
@@ -179,9 +164,7 @@ public class ThirdPersonController : MonoBehaviour
 
     }
 
-
-    //This function makes the character end his jump if he hits his head on something
-    void HeadHittingDetect()
+    private void HeadHittingDetect()
     {
         float headHitDistance = 1.1f;
         Vector3 ccCenter = transform.TransformPoint(cc.center);
@@ -196,5 +179,4 @@ public class ThirdPersonController : MonoBehaviour
             isJumping = false;
         }
     }
-
 }
