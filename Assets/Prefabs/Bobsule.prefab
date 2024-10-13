@@ -93,11 +93,11 @@ GameObject:
   m_Component:
   - component: {fileID: 4133739290504169178}
   - component: {fileID: 4133739290504169173}
-  - component: {fileID: 4133739290504169183}
   - component: {fileID: 4133739290504169179}
   - component: {fileID: 4133739290504169176}
   - component: {fileID: 4133739290504169177}
   - component: {fileID: 4133739290504169182}
+  - component: {fileID: 3569458846822588639}
   m_Layer: 0
   m_Name: Bobsule
   m_TagString: Player
@@ -134,27 +134,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 643c30a8f9772bd4686e4df9c89d16db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementPanel: {fileID: 0}
-  movePad: {fileID: 0}
-  movePadSlider: {fileID: 0}
-  movementSpeedMultiplier: 2
---- !u!114 &4133739290504169183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4133739290504169180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dbd62af2a25df34c9a8e8a7bcb2c370, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  velocity: 15
+  velocity: 5
   sprintAdittion: 3.5
-  jumpForce: 20
+  jumpForce: 18
   jumpTime: 0.85
-  gravity: 10
+  gravity: 9.8
+  movementSpeedMultiplier: 2
 --- !u!33 &4133739290504169179
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -232,11 +217,32 @@ CharacterController:
   serializedVersion: 2
   m_Height: 2.0000002
   m_Radius: 0.5
-  m_SlopeLimit: 45
+  m_SlopeLimit: 60
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &3569458846822588639
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4133739290504169180}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a2296b07792ef0a48881da9e49ba311c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4133739290615376038
 GameObject:
   m_ObjectHideFlags: 0
