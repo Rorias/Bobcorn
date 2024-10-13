@@ -29,7 +29,6 @@ public class CameraController : MonoBehaviour
         player = GameObject.FindWithTag("Player").transform;
         offsetDistanceY = transform.position.y;
 
-        // Lock and hide cursor with option isn't checked
         if (!clickToMoveCamera)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -39,10 +38,8 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        // Follow player - camera offset
         transform.position = player.position + new Vector3(0, offsetDistanceY, 0);
 
-        // Set camera zoom when mouse wheel is scrolled
         if (canZoom && Input.GetAxis("Mouse ScrollWheel") != 0)
         {
             Camera.main.fieldOfView -= Input.GetAxis("Mouse ScrollWheel") * sensitivity * 2;
@@ -55,10 +52,9 @@ public class CameraController : MonoBehaviour
             if (Input.GetAxisRaw("Fire2") == 0) { return; }
         }
 
-        // Calculate new position
         mouseX += Input.GetAxis("Mouse X") * sensitivity;
         mouseY += Input.GetAxis("Mouse Y") * sensitivity;
-        // Apply camera limts
+
         mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
 
         transform.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
