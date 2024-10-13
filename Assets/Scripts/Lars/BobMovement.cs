@@ -177,4 +177,3 @@ public class BobMovement : MonoBehaviour
         cc.SimpleMove(new Vector3(moveSpeed.x, 0, moveSpeed.y) * movementSpeedMultiplier);
     }
 }
-
