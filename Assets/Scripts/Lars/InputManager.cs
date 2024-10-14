@@ -101,7 +101,8 @@ public sealed class InputManager
             new Key() { code = KeyCode.JoystickButton0/*X*/, type = KeyType.Controller },
         } },
         { InputKey.Roll, new List<Key> {
-            new Key() { code = KeyCode.Space, type = KeyType.Keyboard },
+            new Key() { code = KeyCode.LeftShift, type = KeyType.Keyboard },
+            new Key() { code = KeyCode.RightShift, type = KeyType.Keyboard },
             new Key() { code = KeyCode.JoystickButton1/*O*/, type = KeyType.Controller },
         } },
         { InputKey.Run, new List<Key> {
@@ -153,7 +154,7 @@ public sealed class InputManager
         { InputKey.Back, KeyCode.S },
         { InputKey.Jump, KeyCode.Space },
         { InputKey.Crouch, KeyCode.LeftControl },
-        { InputKey.Roll, KeyCode.Space },
+        { InputKey.Roll, KeyCode.LeftShift },
         { InputKey.Run, KeyCode.LeftShift },
     };
 

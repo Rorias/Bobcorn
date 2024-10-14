@@ -13,7 +13,9 @@ public class BobMovement : MonoBehaviour
     [Tooltip("Speed ​​at which the character moves. It is not affected by gravity or jumping.")]
     public float velocity = 5f;
     [Tooltip("This value is added to the speed value while the character is sprinting.")]
-    public float sprintAdittion = 3.5f;
+    public float runAddition = 3.5f;
+    [Tooltip("This value is added to the speed value while the character is sprinting.")]
+    public float rollAddition = 8f;
     [Tooltip("The higher the value, the higher the character will jump.")]
     public float jumpForce = 18f;
     [Tooltip("Stay in the air. The higher the value, the longer the character floats before falling.")]
@@ -22,12 +24,16 @@ public class BobMovement : MonoBehaviour
     [Tooltip("Force that pulls the player down. Changing this value causes all movement, jumping and falling to be changed as well.")]
     public float gravity = 9.8f;
 
+    public bool crouchToggle;
+    public bool runToggle;
+
 
     private float jumpElapsedTime = 0;
 
     // Player states
     private bool isJumping = false;
-    private bool isSprinting = false;
+    private bool isRunning = false;
+    private bool isRolling = false;
     private bool isCrouching = false;
 
     // Inputs
@@ -35,7 +41,8 @@ public class BobMovement : MonoBehaviour
     private float inputVertical;
     private bool inputJump;
     private bool inputCrouch;
-    private bool inputSprint;
+    private bool inputRun;
+    private bool inputRoll;
 
 
     public float movementSpeedMultiplier;
@@ -50,14 +57,12 @@ public class BobMovement : MonoBehaviour
     private Vector2 startPos;
     private Vector2 touchPos;
 
-    private bool pressed;
-
     private void Awake()
     {
         input = InputManager.Instance;
 
         cc = GetComponent<CharacterController>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     private void Start()
@@ -90,27 +95,34 @@ public class BobMovement : MonoBehaviour
         }
         else
         {
-            PcMovement();
+            GetMovementPC();
+            Run();
+            Roll();
         }
     }
 
     private void FixedUpdate()
     {
-        float velocityAdittion = 0;
+        float velocityAddition = 0;
 
-        if (isSprinting)
+        if (isRunning)
         {
-            velocityAdittion = sprintAdittion;
+            velocityAddition = runAddition;
         }
 
         if (isCrouching)
         {
-            velocityAdittion = -(velocity * 0.50f); // -50% velocity
+            velocityAddition = -(velocity * 0.50f); // -50% velocity
+        }
+
+        if (isRolling)
+        {
+            velocityAddition = rollAddition;
         }
 
         // Direction movement
-        float directionX = inputHorizontal * (velocity + velocityAdittion) * Time.deltaTime;
-        float directionZ = inputVertical * (velocity + velocityAdittion) * Time.deltaTime;
+        float directionX = inputHorizontal * (velocity + velocityAddition) * Time.deltaTime;
+        float directionZ = inputVertical * (velocity + velocityAddition) * Time.deltaTime;
         float directionY = 0;
 
         // Jump handler
@@ -151,6 +163,7 @@ public class BobMovement : MonoBehaviour
         {
             float angle = Mathf.Atan2(forward.x + right.x, forward.z + right.z) * Mathf.Rad2Deg;
             Quaternion rotation = Quaternion.Euler(0, angle, 0);
+
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.15f);
         }
 
@@ -170,7 +183,10 @@ public class BobMovement : MonoBehaviour
 
     private void Run()
     {
-
+        if (isRunning)
+        {
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x + 1, transform.eulerAngles.y, transform.eulerAngles.z);
+        }
     }
 
     private void Jump()
@@ -198,36 +214,10 @@ public class BobMovement : MonoBehaviour
 
     }
 
-    private void Down()
-    {
-        switch (rayResults[0].gameObject.name)
-        {
-            case "Camera":
-                InitMoveCamera();
-                break;
-            case "Action":
-                break;
-            case "Movement":
-                InitMoveInDirection();
-                break;
-            default:
-                break;
-        }
-
-        Debug.Log(rayResults[0].gameObject.name);
-    }
-
     private void Up()
     {
-        pressed = false;
         //movePad.gameObject.SetActive(false);
         // movePadSlider.gameObject.SetActive(false);
-    }
-
-    private void InitMoveCamera()
-    {
-        pressed = true;
-        //initialField = TouchField.camera;
     }
 
     private void InitMoveInDirection()
@@ -251,11 +241,6 @@ public class BobMovement : MonoBehaviour
         //movePadSlider.anchoredPosition = initialMovePadPos;
     }
 
-    private void MoveCamera()
-    {
-
-    }
-
     private void MoveInDirection()
     {
         //Vector2 moveOffset = Vector2.ClampMagnitude(touchPos - startPos, movePad.rect.width / 2);
@@ -265,46 +250,84 @@ public class BobMovement : MonoBehaviour
         //cc.SimpleMove(new Vector3(moveSpeed.x, 0, moveSpeed.y) * movementSpeedMultiplier);
     }
 
-    private void PcMovement()
+    private void GetMovementPC()
     {
-        inputHorizontal = input.GetKey(InputManager.InputKey.Left) ? -1 : 0;
-        inputHorizontal = input.GetKey(InputManager.InputKey.Right) ? 1 : 0;
-        Debug.Log(input.GetAxisPosition(InputManager.InputAxis.XaxisLeft) + " left");
-        Debug.Log(input.GetAxisPosition(InputManager.InputAxis.XaxisRight) + " right");
-        inputVertical = Input.GetAxis("Vertical");
+        GetHorizontal();
+        GetVertical();
 
-        inputSprint = input.GetKey(InputManager.InputKey.Run);
+        if (crouchToggle)
+        {
+            inputCrouch = input.GetKeyDown(InputManager.InputKey.Crouch);
 
-        inputCrouch = input.GetKeyDown(InputManager.InputKey.Crouch);
+            if (inputCrouch)
+            {
+                isCrouching = !isCrouching;
+            }
+        }
+        else
+        {
+            isCrouching = input.GetKey(InputManager.InputKey.Crouch);
+        }
+
+        if (runToggle)
+        {
+            inputRun = input.GetKeyDown(InputManager.InputKey.Run);
+            inputRoll = input.GetKeyDown(InputManager.InputKey.Roll);
+
+            if (inputRun)
+            {
+                isRunning = !isRunning;
+            }
+
+            if (inputRoll && isCrouching)
+            {
+                isRolling = !isRolling;
+                isRunning = !isRolling;
+            }
+        }
+        else
+        {
+
+            inputRun = input.GetKey(InputManager.InputKey.Run);
+
+            if (cc.velocity.magnitude > 0)
+            {
+                isRunning = inputRun;
+            }
+
+            if (isCrouching)
+            {
+                isRolling = input.GetKey(InputManager.InputKey.Roll);
+                isRunning = false;
+            }
+        }
 
         // Check if you pressed the crouch input key and change the player's state
-        if (inputCrouch)
-        {
-            isCrouching = !isCrouching;
-        }
+
 
         // Run and Crouch animation
         // If dont have animator component, this block wont run
-        if (cc.isGrounded && animator != null)
-        {
-            // Crouch
-            // Note: The crouch animation does not shrink the character's collider
-            animator.SetBool("crouch", isCrouching);
-
-            // Run
-            float minimumSpeed = 0.9f;
-            animator.SetBool("run", cc.velocity.magnitude > minimumSpeed);
-
-            // Sprint
-            isSprinting = cc.velocity.magnitude > minimumSpeed && inputSprint;
-            animator.SetBool("sprint", isSprinting);
-
-        }
-
-        // Jump animation
         if (animator != null)
         {
-            animator.SetBool("air", cc.isGrounded == false);
+            if (cc.isGrounded)
+            {
+                animator.SetFloat("velocity", cc.velocity.magnitude);
+                // Crouch
+                // Note: The crouch animation does not shrink the character's collider
+                animator.SetBool("crouch", isCrouching);
+
+                animator.SetBool("roll", isRolling);
+                // Run
+                float minimumSpeed = 0.9f;
+                animator.SetBool("walk", cc.velocity.magnitude > minimumSpeed && (inputHorizontal != 0 || inputVertical != 0));
+
+                // Sprint
+                // isRunning = cc.velocity.magnitude > minimumSpeed && inputRun;
+                animator.SetBool("run", isRunning);
+            }
+
+            // Jump animation
+            animator.SetBool("jump", cc.isGrounded == false);
         }
 
         // Handle can jump or not
@@ -313,6 +336,53 @@ public class BobMovement : MonoBehaviour
             isJumping = true;
             // Disable crounching when jumping
             //isCrouching = false; 
+        }
+    }
+
+    private void GetHorizontal()
+    {
+        inputHorizontal = 0;
+
+        if (input.GetKey(InputManager.InputKey.Left))
+        {
+            inputHorizontal = -1;
+        }
+
+        if (input.GetKey(InputManager.InputKey.Right))
+        {
+            inputHorizontal = 1;
+        }
+
+        if (input.GetAxis(InputManager.InputAxis.XaxisLeft))
+        {
+            inputHorizontal = input.GetAxisPosition(InputManager.InputAxis.XaxisLeft);
+        }
+
+        if (input.controllerConnected)
+        {
+            Debug.Log(input.GetAxisPosition(InputManager.InputAxis.XaxisLeft) + " left");
+            Debug.Log(input.GetAxisPosition(InputManager.InputAxis.XaxisRight) + " right");
+        }
+    }
+
+    private void GetVertical()
+    {
+        inputVertical = 0;
+
+        if (input.GetKey(InputManager.InputKey.Back))
+        {
+            inputVertical = -1;
+        }
+
+        if (input.GetKey(InputManager.InputKey.Forward))
+        {
+            inputVertical = 1;
+        }
+
+        if (input.controllerConnected)
+        {
+            Debug.Log(input.GetAxisPosition(InputManager.InputAxis.YaxisBack) + " back");
+            Debug.Log(input.GetAxisPosition(InputManager.InputAxis.YaxisForward) + " forward");
         }
     }
 }
