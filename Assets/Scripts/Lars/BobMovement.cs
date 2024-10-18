@@ -10,6 +10,8 @@ using UnityEngine.UI;
 
 public class BobMovement : MonoBehaviour
 {
+    private enum GroundType { None, Ground, Bouncy, Slippery };
+
     [Tooltip("Speed ​​at which the character moves. It is not affected by gravity or jumping.")]
     public float velocity = 5f;
     [Tooltip("This value is added to the speed value while the character is sprinting.")]
@@ -29,6 +31,8 @@ public class BobMovement : MonoBehaviour
 
 
     private float jumpElapsedTime = 0;
+    private float hitWallAngle;
+    private GroundType currentGround;
 
     // Player states
     private bool isJumping = false;
@@ -103,77 +107,80 @@ public class BobMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float velocityAddition = 0;
-
-        if (isRunning)
+        if (!animator.GetBool("collide"))
         {
-            velocityAddition = runAddition;
-        }
+            float velocityAddition = 0;
 
-        if (isCrouching)
-        {
-            velocityAddition = -(velocity * 0.50f); // -50% velocity
-        }
-
-        if (isRolling)
-        {
-            velocityAddition = rollAddition;
-        }
-
-        // Direction movement
-        float directionX = inputHorizontal * (velocity + velocityAddition) * Time.deltaTime;
-        float directionZ = inputVertical * (velocity + velocityAddition) * Time.deltaTime;
-        float directionY = 0;
-
-        // Jump handler
-        if (isJumping)
-        {
-            // Apply inertia and smoothness when climbing the jump
-            // It is not necessary when descending, as gravity itself will gradually pulls
-            directionY = Mathf.SmoothStep(jumpForce, jumpForce * 0.30f, jumpElapsedTime / jumpTime) * Time.deltaTime;
-
-            // Jump timer
-            jumpElapsedTime += Time.deltaTime;
-            if (jumpElapsedTime >= jumpTime)
+            if (isRunning)
             {
-                isJumping = false;
-                jumpElapsedTime = 0;
+                velocityAddition = runAddition;
             }
+
+            if (isCrouching)
+            {
+                velocityAddition = -(velocity * 0.50f); // -50% velocity
+            }
+
+            if (isRolling)
+            {
+                velocityAddition = rollAddition;
+            }
+
+            // Direction movement
+            float directionX = inputHorizontal * (velocity + velocityAddition) * Time.deltaTime;
+            float directionZ = inputVertical * (velocity + velocityAddition) * Time.deltaTime;
+            float directionY = 0;
+
+            // Jump handler
+            if (isJumping)
+            {
+                // Apply inertia and smoothness when climbing the jump
+                // It is not necessary when descending, as gravity itself will gradually pulls
+                directionY = Mathf.SmoothStep(jumpForce, jumpForce * 0.30f, jumpElapsedTime / jumpTime) * Time.deltaTime;
+
+                // Jump timer
+                jumpElapsedTime += Time.deltaTime;
+                if (jumpElapsedTime >= jumpTime)
+                {
+                    isJumping = false;
+                    jumpElapsedTime = 0;
+                }
+            }
+
+            // Add gravity to Y axis
+            directionY = directionY - gravity * Time.deltaTime;
+
+
+            // --- Character rotation --- 
+            Vector3 forward = Camera.main.transform.forward;
+            Vector3 right = Camera.main.transform.right;
+
+            forward.y = 0;
+            right.y = 0;
+
+            forward.Normalize();
+            right.Normalize();
+
+            // Relate the front with the Z direction (depth) and right with X (lateral movement)
+            forward *= directionZ;
+            right *= directionX;
+
+            if (directionX != 0 || directionZ != 0)
+            {
+                float angle = Mathf.Atan2(forward.x + right.x, forward.z + right.z) * Mathf.Rad2Deg;
+                Quaternion rotation = Quaternion.Euler(0, angle, 0);
+
+                transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.15f);
+            }
+
+            // --- End rotation ---
+            Vector3 verticalDirection = Vector3.up * directionY;
+            Vector3 horizontalDirection = forward + right;
+
+            Vector3 movement = verticalDirection + horizontalDirection;
+
+            cc.Move(movement);
         }
-
-        // Add gravity to Y axis
-        directionY = directionY - gravity * Time.deltaTime;
-
-
-        // --- Character rotation --- 
-        Vector3 forward = Camera.main.transform.forward;
-        Vector3 right = Camera.main.transform.right;
-
-        forward.y = 0;
-        right.y = 0;
-
-        forward.Normalize();
-        right.Normalize();
-
-        // Relate the front with the Z direction (depth) and right with X (lateral movement)
-        forward *= directionZ;
-        right *= directionX;
-
-        if (directionX != 0 || directionZ != 0)
-        {
-            float angle = Mathf.Atan2(forward.x + right.x, forward.z + right.z) * Mathf.Rad2Deg;
-            Quaternion rotation = Quaternion.Euler(0, angle, 0);
-
-            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.15f);
-        }
-
-        // --- End rotation ---
-        Vector3 verticalDirection = Vector3.up * directionY;
-        Vector3 horizontalDirection = forward + right;
-
-        Vector3 movement = verticalDirection + horizontalDirection;
-
-        cc.Move(movement);
     }
 
     private void Walk()
@@ -254,6 +261,9 @@ public class BobMovement : MonoBehaviour
     {
         GetHorizontal();
         GetVertical();
+        float slope = GetGroundAngle();
+        //Debug.Log(slope + " ground angle");
+        Debug.Log(hitWallAngle + " wall angle");
 
         if (crouchToggle)
         {
@@ -311,14 +321,14 @@ public class BobMovement : MonoBehaviour
         {
             if (cc.isGrounded)
             {
+                float minimumSpeed = 0.9f;
                 animator.SetFloat("velocity", cc.velocity.magnitude);
                 // Crouch
                 // Note: The crouch animation does not shrink the character's collider
                 animator.SetBool("crouch", isCrouching);
 
-                animator.SetBool("roll", isRolling);
+                animator.SetBool("roll", isRolling && cc.velocity.magnitude > minimumSpeed);
                 // Run
-                float minimumSpeed = 0.9f;
                 animator.SetBool("walk", cc.velocity.magnitude > minimumSpeed && (inputHorizontal != 0 || inputVertical != 0));
 
                 // Sprint
@@ -326,8 +336,14 @@ public class BobMovement : MonoBehaviour
                 animator.SetBool("run", isRunning);
             }
 
+            animator.SetBool("collide", isRolling && hitWallAngle > 60);
             // Jump animation
             animator.SetBool("jump", cc.isGrounded == false);
+
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("CollideBounce") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
+            {
+                cc.Move(-transform.forward / 10);
+            }
         }
 
         // Handle can jump or not
@@ -383,6 +399,48 @@ public class BobMovement : MonoBehaviour
         {
             Debug.Log(input.GetAxisPosition(InputManager.InputAxis.YaxisBack) + " back");
             Debug.Log(input.GetAxisPosition(InputManager.InputAxis.YaxisForward) + " forward");
+        }
+    }
+
+    private float GetGroundAngle()
+    {
+        RaycastHit hit;
+        float angle = 0.0f;
+
+        if (Physics.Raycast(transform.position, -transform.up, out hit, (2 * transform.localScale.y) + 0.2f, LayerMask.GetMask("Default")))
+        {
+            angle = Vector3.Angle(hit.normal, Vector2.up);
+        }
+
+        return angle;
+    }
+
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Debug.Log(hit.point.y + " is");
+
+        if ((cc.collisionFlags & CollisionFlags.Sides) != 0)
+        {
+            Debug.Log(transform.position.y + (transform.localScale.y / (transform.localScale.y * 10)) + "to surpass");
+
+            float yOffset = ((transform.localScale.y / 2) + (transform.localScale.y / (transform.localScale.y * 10)));
+
+            if (hit.point.y > transform.position.y - yOffset)
+            {
+                hitWallAngle = Vector3.Angle(hit.normal, Vector2.up);
+            }
+        }
+        else
+        {
+            hitWallAngle = 0;
+        }
+
+        switch (hit.collider.material)
+        {
+
+            default:
+                break;
         }
     }
 }
