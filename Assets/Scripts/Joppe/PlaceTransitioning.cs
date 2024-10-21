@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlaceTransitioning : MonoBehaviour
 {
     public GameObject player;
-    public CharacterController playerCC;
+    private CharacterController playerCC;
     private Transform teleportPosition;
     public Animator transitionerCanvas;
 
