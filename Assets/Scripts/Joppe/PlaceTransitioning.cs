@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlaceTransitioning : MonoBehaviour
 {
     public GameObject player;
+    public CharacterController playerCC;
     private Transform teleportPosition;
     public Animator transitionerCanvas;
 
@@ -13,6 +14,7 @@ public class PlaceTransitioning : MonoBehaviour
     {
         teleportPosition = transform.GetChild(0).gameObject.transform;
         player = GameObject.FindGameObjectWithTag("Player");
+        playerCC = player.GetComponent<CharacterController>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -25,7 +27,10 @@ public class PlaceTransitioning : MonoBehaviour
     private IEnumerator TeleportSequence()
     {
         transitionerCanvas.Play("PopcornTransition");
+        playerCC.enabled = false;
         yield return new WaitForSeconds(1.2f);
         player.transform.position = teleportPosition.position;
+        yield return new WaitForSeconds(1f);
+        playerCC.enabled = true;
     }
 }
