@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class BobMovement : MonoBehaviour
 {
-    private enum GroundType { None, Ground, Bouncy, Slippery };
+    private enum GroundType { None, Ground, Bouncy, Spring, Slippery };
 
     [Tooltip("Speed ​​at which the character moves. It is not affected by gravity or jumping.")]
     public float velocity = 5f;
@@ -134,9 +134,28 @@ public class BobMovement : MonoBehaviour
             // Jump handler
             if (isJumping)
             {
+                float jumpBonus = 1.0f;
+
+                switch (currentGround)
+                {
+                    case GroundType.Spring:
+                        jumpBonus = 1.5f;
+                        break;
+                    case GroundType.Bouncy:
+                        jumpBonus = 1.1f;
+                        break;
+                    case GroundType.Slippery:
+                        jumpBonus = 0.9f;
+                        break;
+                    case GroundType.Ground:
+                    case GroundType.None:
+                    default:
+                        jumpBonus = 1.0f;
+                        break;
+                }
                 // Apply inertia and smoothness when climbing the jump
                 // It is not necessary when descending, as gravity itself will gradually pulls
-                directionY = Mathf.SmoothStep(jumpForce, jumpForce * 0.30f, jumpElapsedTime / jumpTime) * Time.deltaTime;
+                directionY = Mathf.SmoothStep(jumpForce * jumpBonus, jumpForce * 0.3f, jumpElapsedTime / jumpTime) * Time.deltaTime;
 
                 // Jump timer
                 jumpElapsedTime += Time.deltaTime;
@@ -194,11 +213,6 @@ public class BobMovement : MonoBehaviour
         {
             transform.eulerAngles = new Vector3(transform.eulerAngles.x + 1, transform.eulerAngles.y, transform.eulerAngles.z);
         }
-    }
-
-    private void Jump()
-    {
-
     }
 
     private void Roll()
@@ -263,7 +277,7 @@ public class BobMovement : MonoBehaviour
         GetVertical();
         float slope = GetGroundAngle();
         //Debug.Log(slope + " ground angle");
-        Debug.Log(hitWallAngle + " wall angle");
+        //Debug.Log(hitWallAngle + " wall angle");
 
         if (crouchToggle)
         {
@@ -346,13 +360,7 @@ public class BobMovement : MonoBehaviour
             }
         }
 
-        // Handle can jump or not
-        if ((input.GetKeyDown(InputManager.InputKey.Jump) || input.GetTouchDown() == "Jump") && cc.isGrounded)
-        {
-            isJumping = true;
-            // Disable crounching when jumping
-            //isCrouching = false; 
-        }
+        Jump();
     }
 
     private void GetHorizontal()
@@ -415,14 +423,24 @@ public class BobMovement : MonoBehaviour
         return angle;
     }
 
+    private void Jump()
+    {
+        // Handle can jump or not
+        if ((input.GetKeyDown(InputManager.InputKey.Jump) || input.GetTouchDown() == "Jump") && cc.isGrounded)
+        {
+            isJumping = true;
+            // Disable crounching when jumping
+            //isCrouching = false; 
+        }
+    }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        Debug.Log(hit.point.y + " is");
+        //Debug.Log(hit.point.y + " is");
 
         if ((cc.collisionFlags & CollisionFlags.Sides) != 0)
         {
-            Debug.Log(transform.position.y + (transform.localScale.y / (transform.localScale.y * 10)) + "to surpass");
+            //Debug.Log(transform.position.y + (transform.localScale.y / (transform.localScale.y * 10)) + "to surpass");
 
             float yOffset = ((transform.localScale.y / 2) + (transform.localScale.y / (transform.localScale.y * 10)));
 
@@ -436,10 +454,22 @@ public class BobMovement : MonoBehaviour
             hitWallAngle = 0;
         }
 
-        switch (hit.collider.material)
+        switch (hit.collider.material.name)
         {
-
+            case "Bouncy (Instance)":
+                currentGround = GroundType.Bouncy;
+                break;
+            case "Slippery (Instance)":
+                currentGround = GroundType.Slippery;
+                break;
+            case "Ground (Instance)":
+                currentGround = GroundType.Ground;
+                break;
+            case "Spring (Instance)":
+                currentGround = GroundType.Spring;
+                break;
             default:
+                currentGround = GroundType.None;
                 break;
         }
     }
