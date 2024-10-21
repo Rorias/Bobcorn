@@ -240,9 +240,9 @@ MonoBehaviour:
   velocity: 5
   runAddition: 3.5
   rollAddition: 8
-  jumpForce: 18
+  jumpForce: 28
   jumpTime: 0.85
-  gravity: 9.8
+  gravity: 16
   crouchToggle: 1
   runToggle: 0
   movementSpeedMultiplier: 2
