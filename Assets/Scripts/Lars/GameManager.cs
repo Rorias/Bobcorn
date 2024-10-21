@@ -103,4 +103,4 @@ public class GameManager : MonoBehaviour
         gameSettings.SaveSettings();
     }
 }
-
+[Flags] public enum CollectableType { None, Popcorn, Ducky, };
