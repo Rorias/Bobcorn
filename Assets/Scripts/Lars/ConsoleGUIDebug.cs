@@ -25,6 +25,16 @@ public class ConsoleGUIDebug : MonoBehaviour
         {
             active = !active;
         }
+
+        if (Input.touchCount > 2)
+        {
+            Touch touch = Input.GetTouch(2);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                active = !active;
+            }
+        }
     }
 
     public void Log(string logString, string stackTrace, LogType type)
