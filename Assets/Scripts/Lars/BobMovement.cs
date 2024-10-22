@@ -314,10 +314,7 @@ public class BobMovement : MonoBehaviour
 
             inputRun = input.GetKey(InputManager.InputKey.Run);
 
-            if (cc.velocity.magnitude > 0)
-            {
-                isRunning = inputRun;
-            }
+            isRunning = inputRun && cc.velocity.magnitude > 0;
 
             if (isCrouching)
             {

@@ -32,10 +32,13 @@ public class CollectableManager : MonoBehaviour
         for (int i = 0; i < gameManager.collectables.Count; i++)
         {
             CollectableSO thisCollectableSO = gameManager.collectables.First(x => x.collectableName == collectables[i].collectableName);
-            CollectableItem thisollectableItem = collectableItemsInScene.First(x => x.collectableSO.collectableName == thisCollectableSO.collectableName);
+            CollectableItem thisollectableItem = collectableItemsInScene.FirstOrDefault(x => x.collectableSO.collectableName == thisCollectableSO.collectableName);
             CollectableData thisCollectable = collectables.First(x => x.collectableName == thisCollectableSO.collectableName);
 
-            thisollectableItem.InitializeCollectable(thisCollectable);
+            if (thisollectableItem != null)
+            {
+                thisollectableItem.InitializeCollectable(thisCollectable);
+            }
         }
     }
 
