@@ -37,12 +37,24 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         GameSettings.file = Application.persistentDataPath + "/" + GameSettings.fileName + ".json";
+        GameSaveManager.savesPath = Application.persistentDataPath + "/Saves/";
 
         gameSettings = GameSettings.Instance;
+        gameSaves = GameSaveManager.Instance;
         input = InputManager.Instance;
+
         onPC = SystemInfo.deviceType == DeviceType.Desktop;
 
         LoadSettings();
+
+        if (GameSaveManager.savedGames.Count > 0)
+        {
+            currentGame = GameSaveManager.savedGames[0];
+        }
+        else
+        {
+            currentGame = new GameSave(-1);
+        }
 
         if (Input.GetJoystickNames().Length > 0 && !string.IsNullOrWhiteSpace(Input.GetJoystickNames()[0]))
         {
@@ -58,7 +70,13 @@ public class GameManager : MonoBehaviour
     public static bool onPC;
 
     private GameSettings gameSettings;
+    private GameSaveManager gameSaves;
     private InputManager input;
+
+    private CollectableManager collectableManager;
+
+    public List<CollectableSO> collectables = new List<CollectableSO>();
+    public GameSave currentGame;
 
     private void FauxAwake(Scene _s, LoadSceneMode _lsm)
     {
@@ -80,6 +98,9 @@ public class GameManager : MonoBehaviour
             gameSettings.firstLoad = false;
             SaveInputs();
         }
+
+        collectableManager = FindObjectOfType<CollectableManager>();
+        LoadGame();
     }
 
     private void Update()
@@ -101,6 +122,17 @@ public class GameManager : MonoBehaviour
     {
         input.SaveInputs(gameSettings);
         gameSettings.SaveSettings();
+    }
+
+    public void LoadGame()
+    {
+        collectableManager.Load(currentGame);
+    }
+
+    public void SaveGame()
+    {
+        collectableManager.Save(currentGame);
+        currentGame.SaveGame();
     }
 }
 [Flags] public enum CollectableType { None, Popcorn, Ducky, };

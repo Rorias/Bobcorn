@@ -10,11 +10,12 @@ using UnityEngine.UI;
 [RequireComponent(typeof(AudioSource)), RequireComponent(typeof(Animator)), RequireComponent(typeof(BoxCollider))]
 public class CollectableItem : MonoBehaviour
 {
-    [HideInInspector] public CollectableData collectable;
+    [NonSerialized] public CollectableData collectable;
     public CollectableSO collectableSO;
 
     public AudioClip soundEffect;
-    public AnimationClip animationEffect;
+
+    private GameManager gameManager;
 
     private AudioSource audioSource;
     private Animator anim;
@@ -22,6 +23,8 @@ public class CollectableItem : MonoBehaviour
 
     private void Awake()
     {
+        gameManager = GameManager.Instance;
+
         audioSource = GetComponent<AudioSource>();
         anim = GetComponent<Animator>();
         boxColl = GetComponent<BoxCollider>();
@@ -29,13 +32,15 @@ public class CollectableItem : MonoBehaviour
         audioSource.dopplerLevel = 0;
         audioSource.playOnAwake = false;
 
+        anim.applyRootMotion = true;
+        anim.Play("Collectable", 0, 0);
+
         boxColl.isTrigger = true;
     }
 
     public void InitializeCollectable(CollectableData _collectable)
     {
-        collectable.collectableName = _collectable.collectableName;
-        collectable.collected = _collectable.collected;
+        collectable = _collectable;
 
         if (collectable.collected)
         {
@@ -48,7 +53,6 @@ public class CollectableItem : MonoBehaviour
         if (_coll.CompareTag("Player"))
         {
             boxColl.enabled = false;
-            collectable.collected = true;
 
             if (soundEffect != null)
             {
@@ -56,11 +60,34 @@ public class CollectableItem : MonoBehaviour
                 audioSource.Play();
             }
 
-            if (animationEffect != null)
-            {
-                anim.Play(animationEffect.name, 0, 0);
-            }
+            Collect();
+            gameManager.SaveGame();
+            StartCoroutine(ICollected());
         }
+    }
+
+    private void Collect()
+    {
+        if (collectable.recollectable)
+        {
+            collectable.collectionCount++;
+            return;
+        }
+
+        collectable.collected = true;
+    }
+
+    private IEnumerator ICollected()
+    {
+        anim.Play("Collected", 0, 0);
+        yield return new WaitForEndOfFrame();
+
+        while (anim.GetCurrentAnimatorStateInfo(0).IsName("Collected") && anim.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
+        {
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 }
 
