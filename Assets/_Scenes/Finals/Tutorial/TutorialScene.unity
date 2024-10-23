@@ -25886,7 +25886,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1234355268}
         m_TargetAssemblyTypeName: BobMovement, Assembly-CSharp
         m_MethodName: CrouchButtonMobile
         m_Mode: 1
@@ -26336,6 +26336,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 46c54894626b4d04e8680a2c4599722c, type: 3}
   m_PrefabInstance: {fileID: 570960147}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1234355268 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6726453323692030746, guid: 949ae472a3b08fe47b951fce6f8e0e26, type: 3}
+  m_PrefabInstance: {fileID: 6726453323301973223}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 643c30a8f9772bd4686e4df9c89d16db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1240462349
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29411,7 +29422,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1234355268}
         m_TargetAssemblyTypeName: BobMovement, Assembly-CSharp
         m_MethodName: JumpRollButtonMobile
         m_Mode: 1
