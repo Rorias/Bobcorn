@@ -71,11 +71,6 @@ public class BobMovement : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    private void Start()
-    {
-
-    }
-
     private void Update()
     {
         if (!GameManager.onPC)
@@ -102,8 +97,6 @@ public class BobMovement : MonoBehaviour
         else
         {
             GetMovementPC();
-            Run();
-            Roll();
         }
     }
 
@@ -171,20 +164,9 @@ public class BobMovement : MonoBehaviour
             // Add gravity to Y axis
             directionY = directionY - gravity * Time.deltaTime;
 
-
+            // --- Character rotation --- 
             Vector3 forward = Camera.main.transform.forward;
             Vector3 right = Camera.main.transform.right;
-
-            // --- Character rotation --- 
-            //if (StaticCamAngle.staticCamera)
-            //{
-            //    forward = transform.forward;
-            //    Debug.DrawRay(transform.position, transform.forward, Color.magenta);
-            //}
-            //else
-            //{
-            //    forward = Camera.main.transform.forward;
-            //}
 
             forward.y = 0;
             right.y = 0;
@@ -224,19 +206,6 @@ public class BobMovement : MonoBehaviour
     }
 
     private void Walk()
-    {
-
-    }
-
-    private void Run()
-    {
-        if (isRunning)
-        {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x + 1, transform.eulerAngles.y, transform.eulerAngles.z);
-        }
-    }
-
-    private void Roll()
     {
 
     }
@@ -296,9 +265,6 @@ public class BobMovement : MonoBehaviour
     {
         GetHorizontal();
         GetVertical();
-        float slope = GetGroundAngle();
-        //Debug.Log(slope + " ground angle");
-        //Debug.Log(hitWallAngle + " wall angle");
 
         if (crouchToggle)
         {
