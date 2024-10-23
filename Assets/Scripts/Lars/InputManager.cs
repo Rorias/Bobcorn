@@ -324,6 +324,62 @@ public sealed class InputManager
         return string.Empty;
     }
 
+    public string GetTouch()
+    {
+        if (Input.touchCount > 0)
+        {
+            EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current)
+            { position = Input.mousePosition, pointerId = -1 }, rayResults);
+
+            if (rayResults.Count > 0)
+            {
+                for (int i = 0; i < Input.touchCount; i++)
+                {
+                    Touch touch = Input.GetTouch(i);
+
+                    if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
+                    {
+                        return rayResults[0].gameObject.name;
+                    }
+                }
+            }
+            else
+            {
+                return "Any";
+            }
+        }
+
+        return string.Empty;
+    }
+
+    public string GetTouchUp()
+    {
+        if (Input.touchCount > 0)
+        {
+            EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current)
+            { position = Input.mousePosition, pointerId = -1 }, rayResults);
+
+            if (rayResults.Count > 0)
+            {
+                for (int i = 0; i < Input.touchCount; i++)
+                {
+                    Touch touch = Input.GetTouch(i);
+
+                    if (touch.phase == TouchPhase.Ended)
+                    {
+                        return rayResults[0].gameObject.name;
+                    }
+                }
+            }
+            else
+            {
+                return "Any";
+            }
+        }
+
+        return string.Empty;
+    }
+
     public bool GetKeyDown(InputKey _key)
     {
         for (int i = 0; i < Inputs[_key].Count; i++)
