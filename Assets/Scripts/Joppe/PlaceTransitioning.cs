@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(BoxCollider))]
 public class PlaceTransitioning : MonoBehaviour
@@ -9,6 +10,8 @@ public class PlaceTransitioning : MonoBehaviour
     private CharacterController playerCC;
     private Transform teleportPosition;
     public Animator transitionerCanvas;
+
+    [SerializeField] private UnityEvent _onTrigger;
 
     private void Start()
     {
@@ -29,6 +32,7 @@ public class PlaceTransitioning : MonoBehaviour
         transitionerCanvas.Play("PopcornTransition");
         playerCC.enabled = false;
         yield return new WaitForSeconds(1.2f);
+        _onTrigger.Invoke();
         player.transform.position = teleportPosition.position;
         yield return new WaitForSeconds(1f);
         playerCC.enabled = true;
