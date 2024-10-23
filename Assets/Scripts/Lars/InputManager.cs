@@ -296,35 +296,34 @@ public sealed class InputManager
         return false;
     }
 
+    public class TouchData
+    {
+        public Touch touch;
+        public string touchedObject;
+    }
+
     public string GetTouchDown()
     {
         if (Input.touchCount > 0)
         {
+            Touch touch = Input.GetTouch(Input.touchCount - 1);
+
             EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current)
             { position = Input.mousePosition, pointerId = -1 }, rayResults);
 
             if (rayResults.Count > 0)
             {
-                for (int i = 0; i < Input.touchCount; i++)
+                if (touch.phase == TouchPhase.Began)
                 {
-                    Touch touch = Input.GetTouch(i);
-
-                    if (touch.phase == TouchPhase.Began)
-                    {
-                        return rayResults[0].gameObject.name;
-                    }
+                    return rayResults[0].gameObject.name;
                 }
-            }
-            else
-            {
-                return "Any";
             }
         }
 
-        return string.Empty;
+        return "";
     }
 
-    public string GetTouch()
+    public string GetTouch(out int _touchIndex)
     {
         if (Input.touchCount > 0)
         {
@@ -336,6 +335,7 @@ public sealed class InputManager
                 for (int i = 0; i < Input.touchCount; i++)
                 {
                     Touch touch = Input.GetTouch(i);
+                    _touchIndex = touch.fingerId;
 
                     if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
                     {
@@ -345,14 +345,16 @@ public sealed class InputManager
             }
             else
             {
+                _touchIndex = -1;
                 return "Any";
             }
         }
 
+        _touchIndex = -1;
         return string.Empty;
     }
 
-    public string GetTouchUp()
+    public string GetTouchUp(int _index)
     {
         if (Input.touchCount > 0)
         {
@@ -361,14 +363,11 @@ public sealed class InputManager
 
             if (rayResults.Count > 0)
             {
-                for (int i = 0; i < Input.touchCount; i++)
-                {
-                    Touch touch = Input.GetTouch(i);
+                Touch touch = Input.GetTouch(_index);
 
-                    if (touch.phase == TouchPhase.Ended)
-                    {
-                        return rayResults[0].gameObject.name;
-                    }
+                if (touch.phase == TouchPhase.Ended)
+                {
+                    return rayResults[0].gameObject.name;
                 }
             }
             else

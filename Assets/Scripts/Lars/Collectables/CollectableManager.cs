@@ -6,7 +6,9 @@ using System.Linq;
 using TMPro;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
 
 public class CollectableManager : MonoBehaviour
 {
@@ -17,22 +19,27 @@ public class CollectableManager : MonoBehaviour
 
     private void Awake()
     {
+        SceneManager.sceneLoaded += FauxAwake;
+    }
+
+    private void FauxAwake(Scene _s, LoadSceneMode _lsm)
+    {
         collectableItemsInScene = FindObjectsByType<CollectableItem>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+
+        InitializeCollectables();
     }
 
     private void Start()
     {
         gameManager = GameManager.Instance;
-
-        InitializeCollectables();
     }
 
     private void InitializeCollectables()
     {
-        for (int i = 0; i < gameManager.collectables.Count; i++)
+        for (int i = 0; i < collectableItemsInScene.Count; i++)
         {
-            CollectableSO thisCollectableSO = gameManager.collectables.First(x => x.collectableName == collectables[i].collectableName);
-            CollectableItem thisollectableItem = collectableItemsInScene.FirstOrDefault(x => x.collectableSO.collectableName == thisCollectableSO.collectableName);
+            CollectableItem thisollectableItem = collectableItemsInScene[i];
+            CollectableSO thisCollectableSO = gameManager.collectables.First(x => x.collectableName == thisollectableItem.collectableSO.collectableName);
             CollectableData thisCollectable = collectables.First(x => x.collectableName == thisCollectableSO.collectableName);
             thisCollectable.recollectable = thisCollectableSO.recollectable;
 

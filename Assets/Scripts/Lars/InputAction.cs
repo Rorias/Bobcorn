@@ -43,7 +43,7 @@ public class InputAction : MonoBehaviour
     {
         if (_coll.CompareTag("Player"))
         {
-            if ((input.GetKeyDown(activationKey) || input.GetTouchDown() == activationTouch))
+            if ((input.GetKeyDown(activationKey) || input.GetTouchDown() == "JumpRollButton"))
             {
                 if (!repeatable && activated)
                 {

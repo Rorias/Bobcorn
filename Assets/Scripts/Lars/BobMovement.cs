@@ -61,18 +61,10 @@ public class BobMovement : MonoBehaviour
     private Animator animator;
     private CharacterController cc;
 
-    private Vector2 startPos;
-    private Vector2 touchPos;
-
     private void Awake()
     {
         input = InputManager.Instance;
-
-        if (!GameManager.onPC)
-        {
-            mobileUI = FindObjectOfType<MobileUI>();
-        }
-
+        mobileUI = FindObjectOfType<MobileUI>();
         cc = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
     }
@@ -304,103 +296,66 @@ public class BobMovement : MonoBehaviour
         Jump();
     }
 
+    public void CrouchButtonMobile()
+    {
+        isCrouching = !isCrouching;
+    }
+
+    public void JumpRollButtonMobile()
+    {
+        if (cc.isGrounded && !isCrouching)
+        {
+            isJumping = true;
+        }
+        else if (isCrouching)
+        {
+            isRolling = !isRolling;
+        }
+    }
+
     private void GetMovementMobile()
     {
-        switch (input.GetTouchDown())
+        if (Input.touchCount > 0)
         {
-            case "Camera":
-                Debug.Log("pressing camera UI");
-                break;
-            case "Action":
-                Debug.Log("pressing action UI");
-                break;
-            case "Movement":
-                Debug.Log("pressing movement UI initial");
-                GetMovementUIInitial();
-                break;
-            case "Any":
-                Debug.Log("pressed outside UI");
-                break;
-            default:
-                //Debug.Log("Not on a touchable device");
-                break;
-        }
+            Touch touch = Input.GetTouch(0);
 
-        switch (input.GetTouch())
-        {
-            case "Camera":
-                Debug.Log("pressing camera UI");
-                break;
-            case "Action":
-                Debug.Log("pressing action UI");
-                break;
-            case "Movement":
-                Debug.Log("pressing movement UI");
-                GetMovementUI();
-                break;
-            case "Any":
-                Debug.Log("pressed outside UI");
-                break;
-            default:
-                //Debug.Log("Not on a touchable device");
-                break;
-        }
+            EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current)
+            { position = Input.mousePosition, pointerId = -1 }, rayResults);
 
-        switch (input.GetTouchUp())
-        {
-            case "Camera":
-                Debug.Log("pressing camera UI");
-                break;
-            case "Action":
-                Debug.Log("pressing action UI");
-                break;
-            case "Movement":
-                Debug.Log("pressing movement UI");
+            if (rayResults.Count > 0 && rayResults[0].gameObject.name == "Movement")
+            {
+                if (touch.phase == TouchPhase.Began)
+                {
+                    mobileUI.OpenMovePad(0);
+                }
+            }
+
+            if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+            {
+                GetMovementUI(0);
+            }
+
+            if (touch.phase == TouchPhase.Ended)
+            {
                 GetMovementUIUp();
-                break;
-            case "Any":
-                Debug.Log("pressed outside UI");
-                break;
-            default:
-                //Debug.Log("Not on a touchable device");
-                break;
+            }
         }
     }
 
-    private void GetMovementUIInitial()
+    private void GetMovementUI(int _touchId)
     {
-        //pressed = true;
-        //initialField = TouchField.movement;
-        //movePad.gameObject.SetActive(true);
-        //movePadSlider.gameObject.SetActive(true);
-        //Debug.Log(rayResults[0].screenPosition + " ray");
-        //Debug.Log(startPos + " start");
-        //Debug.Log(movePadSlider.anchoredPosition + " moveIcon");
-        //Debug.Log(movementPanel.sizeDelta);
-        //Debug.Log(movementPanel.rect.height);
+        Vector2 moveSpeed = mobileUI.MoveMovePad(_touchId);
 
-        //float moveIconX = -(movementPanel.sizeDelta.x / 2);
-        //float moveIconY = -(movementPanel.rect.height / 2);
-        //Vector2 moveIconOffset = new Vector2(moveIconX, moveIconY);
-        //Debug.Log(moveIconOffset);
-        //initialMovePadPos = moveIconOffset + startPos;
-        //movePad.anchoredPosition = initialMovePadPos;
-        //movePadSlider.anchoredPosition = initialMovePadPos;
-    }
-
-    private void GetMovementUI()
-    {
-        //Vector2 moveOffset = Vector2.ClampMagnitude(touchPos - startPos, movePad.rect.width / 2);
-        //movePadSlider.anchoredPosition = initialMovePadPos;
-        //movePadSlider.anchoredPosition = initialMovePadPos + moveOffset;
-        //Vector2 moveSpeed = new Vector2(moveOffset.x / (movePad.rect.width / 2), moveOffset.y / (movePad.rect.width / 2));
-        //cc.SimpleMove(new Vector3(moveSpeed.x, 0, moveSpeed.y) * movementSpeedMultiplier);
+        inputHorizontal = moveSpeed.x;
+        inputVertical = moveSpeed.y;
     }
 
     private void GetMovementUIUp()
     {
-        //movePad.gameObject.SetActive(false);
-        // movePadSlider.gameObject.SetActive(false);
+        mobileUI.CloseMovePad();
+
+        inputHorizontal = 0;
+        inputVertical = 0;
     }
 
     private void GetGeneralMovement()
