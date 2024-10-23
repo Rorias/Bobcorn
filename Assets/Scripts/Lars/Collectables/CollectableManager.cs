@@ -24,14 +24,11 @@ public class CollectableManager : MonoBehaviour
 
     private void FauxAwake(Scene _s, LoadSceneMode _lsm)
     {
+        gameManager = GameManager.Instance;
+
         collectableItemsInScene = FindObjectsByType<CollectableItem>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
 
         InitializeCollectables();
-    }
-
-    private void Start()
-    {
-        gameManager = GameManager.Instance;
     }
 
     private void InitializeCollectables()
