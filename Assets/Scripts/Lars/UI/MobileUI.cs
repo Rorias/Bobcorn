@@ -21,15 +21,28 @@ public class MobileUI : MonoBehaviour
     {
         if (GameManager.onPC)
         {
-            cameraUI.SetActive(false);
+            if (cameraUI != null)
+            {
+                cameraUI.SetActive(false);
+            }
             movementUI.SetActive(false);
             actionUI.SetActive(false);
         }
     }
 
-    private void Update()
+    public void OpenMovePad()
     {
-        
+
+    }
+
+    public void CloseMovePad()
+    {
+
+    }
+
+    public void MoveMovePad()
+    {
+
     }
 }
 
