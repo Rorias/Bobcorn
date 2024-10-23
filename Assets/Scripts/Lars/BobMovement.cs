@@ -26,6 +26,8 @@ public class BobMovement : MonoBehaviour
     [Tooltip("Force that pulls the player down. Changing this value causes all movement, jumping and falling to be changed as well.")]
     public float gravity = 9.8f;
 
+    public float rotationSpeed;
+
     public bool crouchToggle;
     public bool runToggle;
 
@@ -69,11 +71,6 @@ public class BobMovement : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    private void Start()
-    {
-
-    }
-
     private void Update()
     {
         if (!GameManager.onPC)
@@ -100,8 +97,6 @@ public class BobMovement : MonoBehaviour
         else
         {
             GetMovementPC();
-            Run();
-            Roll();
         }
     }
 
@@ -169,7 +164,6 @@ public class BobMovement : MonoBehaviour
             // Add gravity to Y axis
             directionY = directionY - gravity * Time.deltaTime;
 
-
             // --- Character rotation --- 
             Vector3 forward = Camera.main.transform.forward;
             Vector3 right = Camera.main.transform.right;
@@ -184,17 +178,26 @@ public class BobMovement : MonoBehaviour
             forward *= directionZ;
             right *= directionX;
 
-            if (directionX != 0 || directionZ != 0)
+            if (directionX != 0 || directionZ > 0)
             {
                 float angle = Mathf.Atan2(forward.x + right.x, forward.z + right.z) * Mathf.Rad2Deg;
                 Quaternion rotation = Quaternion.Euler(0, angle, 0);
 
-                transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.15f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rotation, rotationSpeed);
             }
 
             // --- End rotation ---
             Vector3 verticalDirection = Vector3.up * directionY;
-            Vector3 horizontalDirection = forward + right;
+            Vector3 horizontalDirection;
+
+            if (StaticCamAngle.staticCamera)
+            {
+                horizontalDirection = forward + right;
+            }
+            else
+            {
+                horizontalDirection = forward;
+            }
 
             Vector3 movement = verticalDirection + horizontalDirection;
 
@@ -203,19 +206,6 @@ public class BobMovement : MonoBehaviour
     }
 
     private void Walk()
-    {
-
-    }
-
-    private void Run()
-    {
-        if (isRunning)
-        {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x + 1, transform.eulerAngles.y, transform.eulerAngles.z);
-        }
-    }
-
-    private void Roll()
     {
 
     }
@@ -275,9 +265,6 @@ public class BobMovement : MonoBehaviour
     {
         GetHorizontal();
         GetVertical();
-        float slope = GetGroundAngle();
-        //Debug.Log(slope + " ground angle");
-        //Debug.Log(hitWallAngle + " wall angle");
 
         if (crouchToggle)
         {
@@ -314,10 +301,7 @@ public class BobMovement : MonoBehaviour
 
             inputRun = input.GetKey(InputManager.InputKey.Run);
 
-            if (cc.velocity.magnitude > 0)
-            {
-                isRunning = inputRun;
-            }
+            isRunning = inputRun && cc.velocity.magnitude > 0;
 
             if (isCrouching)
             {

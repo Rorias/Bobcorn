@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1302180545084913}
   - component: {fileID: 8620595816371381355}
   - component: {fileID: 1876434005864910027}
+  - component: {fileID: 5175378109487834083}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -46,6 +47,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d02a671c81a995c45b3e45f76b592a52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collectables:
+  - {fileID: 11400000, guid: 16f0c8cddf6087647a235a6c5848b7d4, type: 2}
+  - {fileID: 11400000, guid: 40a6b4353a58f14408e931bf65048a95, type: 2}
+  currentGame:
+    gameID: 0
+    gameName: 
+    collectables: []
 --- !u!114 &8620595816371381355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,3 +81,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4abaecfb469ac6345b0775678fb30ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5175378109487834083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8380064829582695281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 169b6de9a6cac6141964852cf47e880f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collectables: []
