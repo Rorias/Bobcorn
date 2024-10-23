@@ -54,6 +54,7 @@ public class BobMovement : MonoBehaviour
     public float movementSpeedMultiplier;
 
     private InputManager input;
+    private MobileUI mobileUI;
 
     private List<RaycastResult> rayResults = new List<RaycastResult>();
 
@@ -67,6 +68,11 @@ public class BobMovement : MonoBehaviour
     {
         input = InputManager.Instance;
 
+        if (!GameManager.onPC)
+        {
+            mobileUI = FindObjectOfType<MobileUI>();
+        }
+
         cc = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
     }
@@ -75,29 +81,14 @@ public class BobMovement : MonoBehaviour
     {
         if (!GameManager.onPC)
         {
-            switch (input.GetTouchDown())
-            {
-                case "Camera":
-                    Debug.Log("pressing camera UI");
-                    break;
-                case "Action":
-                    Debug.Log("pressing action UI");
-                    break;
-                case "Movement":
-                    Debug.Log("pressing movement UI");
-                    break;
-                case "Any":
-                    Debug.Log("pressed outside UI");
-                    break;
-                default:
-                    //Debug.Log("Not on a touchable device");
-                    break;
-            }
+            GetMovementMobile();
         }
         else
         {
             GetMovementPC();
         }
+
+        GetGeneralMovement();
     }
 
     private void FixedUpdate()
@@ -310,9 +301,110 @@ public class BobMovement : MonoBehaviour
             }
         }
 
-        // Check if you pressed the crouch input key and change the player's state
+        Jump();
+    }
 
+    private void GetMovementMobile()
+    {
+        switch (input.GetTouchDown())
+        {
+            case "Camera":
+                Debug.Log("pressing camera UI");
+                break;
+            case "Action":
+                Debug.Log("pressing action UI");
+                break;
+            case "Movement":
+                Debug.Log("pressing movement UI initial");
+                GetMovementUIInitial();
+                break;
+            case "Any":
+                Debug.Log("pressed outside UI");
+                break;
+            default:
+                //Debug.Log("Not on a touchable device");
+                break;
+        }
 
+        switch (input.GetTouch())
+        {
+            case "Camera":
+                Debug.Log("pressing camera UI");
+                break;
+            case "Action":
+                Debug.Log("pressing action UI");
+                break;
+            case "Movement":
+                Debug.Log("pressing movement UI");
+                GetMovementUI();
+                break;
+            case "Any":
+                Debug.Log("pressed outside UI");
+                break;
+            default:
+                //Debug.Log("Not on a touchable device");
+                break;
+        }
+
+        switch (input.GetTouchUp())
+        {
+            case "Camera":
+                Debug.Log("pressing camera UI");
+                break;
+            case "Action":
+                Debug.Log("pressing action UI");
+                break;
+            case "Movement":
+                Debug.Log("pressing movement UI");
+                GetMovementUIUp();
+                break;
+            case "Any":
+                Debug.Log("pressed outside UI");
+                break;
+            default:
+                //Debug.Log("Not on a touchable device");
+                break;
+        }
+    }
+
+    private void GetMovementUIInitial()
+    {
+        //pressed = true;
+        //initialField = TouchField.movement;
+        //movePad.gameObject.SetActive(true);
+        //movePadSlider.gameObject.SetActive(true);
+        //Debug.Log(rayResults[0].screenPosition + " ray");
+        //Debug.Log(startPos + " start");
+        //Debug.Log(movePadSlider.anchoredPosition + " moveIcon");
+        //Debug.Log(movementPanel.sizeDelta);
+        //Debug.Log(movementPanel.rect.height);
+
+        //float moveIconX = -(movementPanel.sizeDelta.x / 2);
+        //float moveIconY = -(movementPanel.rect.height / 2);
+        //Vector2 moveIconOffset = new Vector2(moveIconX, moveIconY);
+        //Debug.Log(moveIconOffset);
+        //initialMovePadPos = moveIconOffset + startPos;
+        //movePad.anchoredPosition = initialMovePadPos;
+        //movePadSlider.anchoredPosition = initialMovePadPos;
+    }
+
+    private void GetMovementUI()
+    {
+        //Vector2 moveOffset = Vector2.ClampMagnitude(touchPos - startPos, movePad.rect.width / 2);
+        //movePadSlider.anchoredPosition = initialMovePadPos;
+        //movePadSlider.anchoredPosition = initialMovePadPos + moveOffset;
+        //Vector2 moveSpeed = new Vector2(moveOffset.x / (movePad.rect.width / 2), moveOffset.y / (movePad.rect.width / 2));
+        //cc.SimpleMove(new Vector3(moveSpeed.x, 0, moveSpeed.y) * movementSpeedMultiplier);
+    }
+
+    private void GetMovementUIUp()
+    {
+        //movePad.gameObject.SetActive(false);
+        // movePadSlider.gameObject.SetActive(false);
+    }
+
+    private void GetGeneralMovement()
+    {
         // Run and Crouch animation
         // If dont have animator component, this block wont run
         if (animator != null)
@@ -343,8 +435,6 @@ public class BobMovement : MonoBehaviour
                 cc.Move(-transform.forward / 10);
             }
         }
-
-        Jump();
     }
 
     private void GetHorizontal()
@@ -410,7 +500,7 @@ public class BobMovement : MonoBehaviour
     private void Jump()
     {
         // Handle can jump or not
-        if ((input.GetKeyDown(InputManager.InputKey.Jump) || input.GetTouchDown() == "Jump") && cc.isGrounded)
+        if ((input.GetKeyDown(InputManager.InputKey.Jump)) && cc.isGrounded)
         {
             isJumping = true;
             // Disable crounching when jumping
