@@ -33,7 +33,7 @@ public class CollectableItem : MonoBehaviour
         audioSource.playOnAwake = false;
 
         anim.applyRootMotion = true;
-        anim.Play("Collectable", 0, 0);
+        anim.Play("Collectable", 0, UnityEngine.Random.Range(0f, 1f));
 
         boxColl.isTrigger = true;
     }

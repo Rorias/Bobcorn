@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collectable: 2
   collectableName: Tutorial Duck
+  recollectable: 1
