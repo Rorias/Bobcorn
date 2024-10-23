@@ -12,5 +12,6 @@ public class CollectableSO : ScriptableObject
 {
     public CollectableType collectable;
     public string collectableName;
+    public bool recollectable;
 }
 

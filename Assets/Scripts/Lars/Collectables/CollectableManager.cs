@@ -34,6 +34,7 @@ public class CollectableManager : MonoBehaviour
             CollectableSO thisCollectableSO = gameManager.collectables.First(x => x.collectableName == collectables[i].collectableName);
             CollectableItem thisollectableItem = collectableItemsInScene.FirstOrDefault(x => x.collectableSO.collectableName == thisCollectableSO.collectableName);
             CollectableData thisCollectable = collectables.First(x => x.collectableName == thisCollectableSO.collectableName);
+            thisCollectable.recollectable = thisCollectableSO.recollectable;
 
             if (thisollectableItem != null)
             {
