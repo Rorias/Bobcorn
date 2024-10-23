@@ -30804,6 +30804,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 941936218}
     m_Modifications:
+    - target: {fileID: 4707012663658361150, guid: da07009e72216014f9707b62d6f9dc23, type: 3}
+      propertyPath: m_ReceiveGI
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4707012663658361150, guid: da07009e72216014f9707b62d6f9dc23, type: 3}
+      propertyPath: m_CastShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4707012663658361150, guid: da07009e72216014f9707b62d6f9dc23, type: 3}
+      propertyPath: m_StaticShadowCaster
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5843851286809725521, guid: da07009e72216014f9707b62d6f9dc23, type: 3}
       propertyPath: m_RootOrder
       value: 22
