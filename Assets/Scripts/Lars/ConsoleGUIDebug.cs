@@ -26,9 +26,9 @@ public class ConsoleGUIDebug : MonoBehaviour
             active = !active;
         }
 
-        if (Input.touchCount > 2)
+        if (Input.touchCount > 4)
         {
-            Touch touch = Input.GetTouch(2);
+            Touch touch = Input.GetTouch(4);
 
             if (touch.phase == TouchPhase.Began)
             {
