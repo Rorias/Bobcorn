@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/_Scenes/Lars/MainMenu.unity
     guid: ac7172d09d012b249b2ea3faba779f36
   - enabled: 1
-    path: Assets/_Scenes/Lars/Test_Scene_Lars.unity
-    guid: c26696a2d43a1f241a0ac118939aa20a
+    path: Assets/_Scenes/Finals/Tutorial/TutorialScene.unity
+    guid: 8c025ce12ca998043afc961a4f13a7a8
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 773e18c53a3e85543b21560d6c150541, type: 2}

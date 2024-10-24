@@ -66,5 +66,5 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _Outline: {r: 1, g: 0.3537736, b: 0.97238344, a: 1}
+    - _Outline: {r: 1, g: 0.6970986, b: 0.35294116, a: 1}
   m_BuildTextureStacks: []
